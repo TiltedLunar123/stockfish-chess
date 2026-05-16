@@ -9,10 +9,14 @@ __pycache__/
 venv/
 env/
 
-# Builds
+# Builds (Nuitka, PyInstaller)
 build/
 dist/
 *.spec
+*.build/
+*.dist/
+*.onefile-build/
+nuitka-crash-report.xml
 
 # Stockfish (the installer drops binaries + extracted source here; we never
 # commit any of it). Keep .gitkeep so the folder exists in a fresh clone.
