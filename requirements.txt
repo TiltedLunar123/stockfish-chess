@@ -1,0 +1,4 @@
+python-chess>=1.10.0
+Pillow>=10.0.0
+resvg-py>=0.3.0
+py-cpuinfo>=9.0.0

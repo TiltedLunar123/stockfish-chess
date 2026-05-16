@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.eggs/
+.Python
+.venv/
+venv/
+env/
+
+# Builds
+build/
+dist/
+*.spec
+
+# Stockfish (the installer drops binaries + extracted source here; we never
+# commit any of it). Keep .gitkeep so the folder exists in a fresh clone.
+stockfish/*
+!stockfish/.gitkeep
+
+# Local-only convenience files at repo root
+stockfish.zip
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stockfish-chess"
+version = "0.1.0"
+description = "A modern desktop chess GUI built around Stockfish."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Jude Hilgendorf" }]
+keywords = ["chess", "stockfish", "gui", "analysis", "tkinter"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Games/Entertainment :: Board Games",
+    "Environment :: X11 Applications",
+    "Environment :: Win32 (MS Windows)",
+]
+dependencies = [
+    "python-chess>=1.10.0",
+    "Pillow>=10.0.0",
+    "resvg-py>=0.3.0",
+    "py-cpuinfo>=9.0.0",
+]
+
+[project.scripts]
+stockfish-chess = "main:main"
+
+[project.urls]
+Issues = "https://github.com/TiltedLunar123/stockfish-chess/issues"
+Source = "https://github.com/TiltedLunar123/stockfish-chess"
+
+[tool.setuptools]
+packages = ["chess_gui"]
+py-modules = ["main"]

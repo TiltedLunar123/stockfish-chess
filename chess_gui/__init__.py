@@ -1,0 +1,1 @@
+"""Stockfish Chess GUI package."""
