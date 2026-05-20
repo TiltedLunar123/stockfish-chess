@@ -12,7 +12,6 @@ env/
 # Builds (Nuitka, PyInstaller)
 build/
 dist/
-*.spec
 *.build/
 *.dist/
 *.onefile-build/
