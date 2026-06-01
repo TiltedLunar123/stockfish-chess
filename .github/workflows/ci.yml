@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # The test suite only exercises the pure logic in installer.py and
+      # engine.py, which need python-chess but none of the GUI/render stack
+      # (tkinter, Pillow, resvg). Installing just those keeps CI fast and off
+      # the heavier wheels that the desktop app pulls in.
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "python-chess>=1.10.0" "pytest>=8.0" ruff
+
+      - name: Lint for errors
+        run: ruff check --select E9,F63,F7,F82 .
+
+      - name: Run tests
+        run: pytest -q

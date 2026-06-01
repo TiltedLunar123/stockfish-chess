@@ -31,6 +31,9 @@ dependencies = [
     "py-cpuinfo>=9.0.0",
 ]
 
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
 [project.scripts]
 stockfish-chess = "main:main"
 
@@ -41,3 +44,7 @@ Source = "https://github.com/TiltedLunar123/stockfish-chess"
 [tool.setuptools]
 packages = ["chess_gui"]
 py-modules = ["main"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

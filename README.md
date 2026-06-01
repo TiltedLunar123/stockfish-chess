@@ -119,10 +119,26 @@ Click the ⚙ icon in the sidebar to open the inline settings panel. Sections:
 │   ├── widgets.py           # shared themed widgets
 │   └── theme.py             # colors, fonts, layout constants
 ├── stockfish/               # engine lives here (installer drops .exe in)
+├── tests/                   # pytest suite for the pure logic
 ├── requirements.txt
 ├── pyproject.toml
 └── README.md
 ```
+
+## Running the tests
+
+The suite covers the display-free logic: the build picker in `installer.py`
+and the rating tiers, engine discovery, setter clamps, score formatting, and
+play-style re-ranking in `engine.py`. It needs `python-chess` and `pytest` but
+none of the GUI or rendering stack, so it runs anywhere.
+
+```bash
+pip install -e .[test]
+pytest
+```
+
+CI runs the same suite on Python 3.10 through 3.12 on every push and pull
+request.
 
 ## Credits
 
