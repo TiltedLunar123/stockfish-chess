@@ -24,9 +24,13 @@ from chess_gui.engine import (
         (1319, "Beginner"),   # below the first cutoff still labels Beginner
         (1500, "Casual"),
         (1800, "Club player"),
+        (2100, "Strong club"),
         (2400, "Expert"),
+        (2600, "Master"),
+        (2800, "Grandmaster"),
         (3000, "Super GM"),
         (9999, "Super GM"),   # anything past the top cutoff caps at Super GM
+        (2099, "Club player"),  # one below a cutoff stays in the lower band
     ],
 )
 def test_tier_for(elo, expected):
