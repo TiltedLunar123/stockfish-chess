@@ -23,6 +23,13 @@ from pathlib import Path
 GITHUB_API = "https://api.github.com/repos/official-stockfish/Stockfish/releases/latest"
 USER_AGENT = "stockfish-chess-installer"
 
+# tarfile extraction filters (PEP 706) refuse members that would escape the
+# destination, including symlink/hardlink members whose *target* points outside
+# it, which a name-only check can't catch. Available on 3.12+ and the security
+# backports (3.10.12+, 3.11.4+); the handful of older 3.10/3.11 patch releases
+# that lack it fall back to refusing link members outright.
+_HAS_TAR_FILTER = hasattr(tarfile, "data_filter")
+
 # (slug, label, required_cpu_flags), ordered most-optimised first.
 # Slugs are the exact text that appears in Stockfish's release asset names.
 WINDOWS_BUILDS = [
@@ -136,7 +143,7 @@ def find_asset(release, expected_name):
     for asset in release.get("assets", []):
         if expected_name in asset["name"]:
             return asset
-    # Fallback: any asset whose name contains the slug
+    # No asset name contained the expected pattern; caller raises a clear error.
     return None
 
 
@@ -178,7 +185,21 @@ def _safe_extract(archive_path, target_dir):
                 p = Path(member.name)
                 if p.is_absolute() or ".." in p.parts:
                     continue
-                tf.extract(member, target_dir)
+                if _HAS_TAR_FILTER:
+                    # The data filter also rejects link members that resolve
+                    # outside target_dir (which the name check above misses) and
+                    # any special files. Skip what it refuses, keep the rest.
+                    try:
+                        tf.extract(member, target_dir, filter="data")
+                    except tarfile.FilterError:
+                        continue
+                else:
+                    # No extraction filter on this runtime: Stockfish archives
+                    # are plain files and dirs, so refuse any link member rather
+                    # than risk a symlink that points outside the target.
+                    if member.issym() or member.islnk():
+                        continue
+                    tf.extract(member, target_dir)
                 members.append(target_dir / member.name)
     else:
         raise RuntimeError(f"Unknown archive format: {archive_path.name}")

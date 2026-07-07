@@ -9,6 +9,8 @@ stay offline and never reach for a live Stockfish download.
 """
 
 import io
+import os
+import stat
 import tarfile
 import zipfile
 
@@ -219,8 +221,113 @@ def test_safe_extract_tar_skips_parent_traversal(tmp_path):
     assert not (tmp_path / "escape").exists()
 
 
+def test_safe_extract_tar_skips_symlink_that_escapes(tmp_path):
+    # A symlink member with a clean name ("stockfish/pwn") but a target that
+    # climbs outside the extraction dir must be refused, not created. The
+    # name-only check can't catch this, so the escape is caught by the data
+    # filter (or, on older Pythons, by refusing link members outright).
+    archive = tmp_path / "evil-link.tar"
+    with tarfile.open(archive, "w") as tf:
+        good = tarfile.TarInfo("stockfish/ok")
+        good.size = 2
+        tf.addfile(good, io.BytesIO(b"ok"))
+        link = tarfile.TarInfo("stockfish/pwn")
+        link.type = tarfile.SYMTYPE
+        link.linkname = "../../secret"
+        tf.addfile(link)
+
+    target = tmp_path / "out"
+    members = installer._safe_extract(archive, target)
+
+    # The clean file still comes through...
+    assert (target / "stockfish" / "ok").read_bytes() == b"ok"
+    # ...but the escaping symlink is neither created nor reported back.
+    pwn = target / "stockfish" / "pwn"
+    assert not pwn.is_symlink()
+    assert not pwn.exists()
+    assert all("pwn" not in str(m) for m in members)
+
+
 def test_safe_extract_rejects_unknown_format(tmp_path):
     archive = tmp_path / "mystery.7z"
     archive.write_bytes(b"not an archive")
     with pytest.raises(RuntimeError):
         installer._safe_extract(archive, tmp_path / "out")
+
+
+# --- _find_extracted_binary: promote the nested Stockfish binary ------------
+
+def test_find_extracted_binary_promotes_nested_binary(tmp_path, monkeypatch):
+    # Stockfish archives put the binary inside a nested stockfish/ folder;
+    # _find_extracted_binary moves it up to target_dir and returns it. Pretend
+    # we're on a POSIX host so the .exe suffix rule doesn't apply.
+    monkeypatch.setattr(installer.sys, "platform", "linux")
+    target = tmp_path / "engine"
+    nested = target / "stockfish"
+    nested.mkdir(parents=True)
+    binary = nested / "stockfish-ubuntu-x86-64-avx2"
+    binary.write_bytes(b"ELF")
+    readme = nested / "readme.md"          # not a stockfish binary
+    readme.write_text("hi")
+    # A directory and the non-matching file come first to prove they're skipped.
+    members = [readme, nested, binary]
+
+    found = installer._find_extracted_binary(target, members)
+
+    assert found == target / "stockfish-ubuntu-x86-64-avx2"
+    assert found.read_bytes() == b"ELF"
+    assert not binary.exists()             # moved out of the nested folder
+    assert readme.exists()                 # left where it was
+    if os.name == "posix":
+        assert found.stat().st_mode & stat.S_IXUSR
+
+
+def test_find_extracted_binary_windows_requires_exe(tmp_path, monkeypatch):
+    # On Windows a stockfish-named file only counts if it ends in .exe.
+    monkeypatch.setattr(installer.sys, "platform", "win32")
+    target = tmp_path / "engine"
+    nested = target / "stockfish"
+    nested.mkdir(parents=True)
+    no_ext = nested / "stockfish-nodll"    # right stem, wrong extension
+    no_ext.write_bytes(b"x")
+    exe = nested / "stockfish-windows-x86-64-avx2.exe"
+    exe.write_bytes(b"MZ")
+    members = [no_ext, exe]                # extensionless one first, gets skipped
+
+    found = installer._find_extracted_binary(target, members)
+
+    assert found == target / "stockfish-windows-x86-64-avx2.exe"
+    assert found.read_bytes() == b"MZ"
+    assert not exe.exists()               # promoted up to target_dir
+
+
+def test_find_extracted_binary_returns_none_without_a_match(tmp_path):
+    target = tmp_path / "engine"
+    target.mkdir()
+    other = target / "someengine.txt"
+    other.write_text("nope")
+    assert installer._find_extracted_binary(target, [other]) is None
+
+
+# --- _cleanup_after_extract: drop the archive and the nested folder ---------
+
+def test_cleanup_after_extract_removes_archive_and_nested_dir(tmp_path):
+    target = tmp_path / "engine"
+    nested = target / "stockfish"
+    nested.mkdir(parents=True)
+    (nested / "leftover").write_text("junk")
+    archive = target / "stockfish-ubuntu-x86-64-avx2.tar"
+    archive.write_bytes(b"tarbytes")
+
+    installer._cleanup_after_extract(target, archive)
+
+    assert not archive.exists()
+    assert not nested.exists()
+
+
+def test_cleanup_after_extract_tolerates_missing_paths(tmp_path):
+    # A missing archive or absent nested dir must not raise; the OSErrors are
+    # swallowed on purpose so a partial install can still finish cleaning up.
+    target = tmp_path / "engine"
+    target.mkdir()
+    installer._cleanup_after_extract(target, target / "gone.tar")
