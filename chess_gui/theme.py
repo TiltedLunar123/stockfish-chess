@@ -1,9 +1,20 @@
 """Colors, fonts, and layout constants."""
 
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-ENGINE_PATH = ROOT / "stockfish" / "stockfish-windows-x86-64-avxvnni.exe"
+ENGINE_DIR = ROOT / "stockfish"
+
+# Where we look before falling back to scanning the folder. The name has to
+# match what the installer actually drops for this platform, otherwise the
+# "Stockfish not found" error quotes a Windows exe at a Linux user.
+_DEFAULT_ENGINE_NAME = {
+    "win32": "stockfish-windows-x86-64-avxvnni.exe",
+    "darwin": "stockfish-macos-m1-apple-silicon",
+}.get(sys.platform, "stockfish-ubuntu-x86-64-avx2")
+
+ENGINE_PATH = ENGINE_DIR / _DEFAULT_ENGINE_NAME
 
 BG = "#1A1A1A"
 PANEL_BG = "#1A1A1A"

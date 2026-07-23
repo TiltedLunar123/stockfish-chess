@@ -167,7 +167,7 @@ class SettingsPanel:
                    color="#E07070", hover="#F38888").pack(side="left")
         self._hint(parent,
                    "Install opens the Stockfish download page in your browser. "
-                   "Drop the .exe into the stockfish folder and it shows up "
+                   "Drop the binary into the stockfish folder and it shows up "
                    "in the dropdown.")
         self._spacer(parent)
 
@@ -349,8 +349,10 @@ class SettingsPanel:
 
     def _short_engine_name(self, path):
         name = Path(path).stem
+        # "ubuntu" is what installer.detect_os() returns for Linux, so that's
+        # the prefix the release assets actually carry.
         for prefix in ("stockfish-windows-", "stockfish-macos-",
-                       "stockfish-linux-", "stockfish-"):
+                       "stockfish-ubuntu-", "stockfish-linux-", "stockfish-"):
             if name.startswith(prefix):
                 return name[len(prefix):]
         return name

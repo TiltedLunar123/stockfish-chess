@@ -15,6 +15,29 @@ from .theme import ENGINE_PATH
 ELO_MIN = 1320
 ELO_MAX = 3200
 
+# Things the installer leaves in the engine folder that are never the engine.
+# Only consulted off Windows, where the binary itself has no extension and so
+# can't be told apart from its neighbours by suffix alone.
+_NON_ENGINE_SUFFIXES = {".tar", ".zip", ".gz", ".nnue", ".txt", ".md", ".json"}
+
+
+def _is_engine_file(path):
+    """True if path looks like a runnable Stockfish binary for this platform.
+
+    Windows builds ship as .exe. The Linux and macOS builds come out of the .tar
+    with no extension at all (stockfish-ubuntu-x86-64-avx2), which is why the
+    suffix check has to be platform-specific: applying the Windows rule
+    everywhere hid every engine the installer produced off Windows.
+    """
+    name = path.name.lower()
+    if "stockfish" not in name:
+        return False
+    if sys.platform == "win32":
+        return name.endswith(".exe")
+    if path.suffix.lower() in _NON_ENGINE_SUFFIXES:
+        return False
+    return os.access(path, os.X_OK)
+
 
 def discover_engines(folder=None):
     """Find Stockfish executables in folder. Returns list of (display, path)."""
@@ -27,8 +50,7 @@ def discover_engines(folder=None):
     for p in sorted(folder.iterdir()):
         if not p.is_file():
             continue
-        name = p.name.lower()
-        if name.endswith(".exe") and "stockfish" in name:
+        if _is_engine_file(p):
             display = p.stem
             results.append((display, str(p)))
     return results

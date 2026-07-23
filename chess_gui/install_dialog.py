@@ -1,5 +1,6 @@
 """First-run install dialog: detect CPU, pick a build, download Stockfish."""
 
+import sys
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -233,9 +234,15 @@ class InstallDialog(tk.Toplevel):
         self.progress_var.set(0)
 
     def _pick_existing(self):
+        # Off Windows the binary has no extension, so an "*.exe" filter hides
+        # the very file the user came here to pick.
+        if sys.platform == "win32":
+            filetypes = [("Executables", "*.exe"), ("All files", "*.*")]
+        else:
+            filetypes = [("All files", "*.*")]
         path = filedialog.askopenfilename(
             title="Locate Stockfish executable",
-            filetypes=[("Executables", "*.exe"), ("All files", "*.*")],
+            filetypes=filetypes,
             parent=self,
         )
         if not path:

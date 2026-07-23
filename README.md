@@ -42,7 +42,9 @@ the official Stockfish GitHub releases. Pick the recommended option for the
 fastest engine, or override with a different build from the dropdown.
 
 If you already have a Stockfish binary, click **Use existing file…** in the
-install dialog and point it at your `.exe`.
+install dialog and point it at that file. On Windows that's the `.exe`; on
+macOS and Linux the official builds have no extension, and the app expects the
+executable bit to be set on them.
 
 ## Engine builds
 
@@ -118,7 +120,7 @@ Click the ⚙ icon in the sidebar to open the inline settings panel. Sections:
 │   ├── fen_bar.py           # editable FEN display
 │   ├── widgets.py           # shared themed widgets
 │   └── theme.py             # colors, fonts, layout constants
-├── stockfish/               # engine lives here (installer drops .exe in)
+├── stockfish/               # engine lives here (installer drops the binary in)
 ├── tests/                   # pytest suite for the pure logic
 ├── requirements.txt
 ├── pyproject.toml
