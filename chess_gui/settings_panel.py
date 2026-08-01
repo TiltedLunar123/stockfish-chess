@@ -213,7 +213,7 @@ class SettingsPanel:
         tk.Label(row, text="seconds", bg=PANEL_BG,
                  fg=TEXT_DIM, font=FONT_BODY).pack(side="left", padx=(10, 0))
         self._hint(parent,
-                   "Slider for 0.1–5s, or click the number to type any value "
+                   "Slider for 0.1-5s, or click the number to type any value "
                    "(up to 60). More time = deeper search = stronger play.")
 
     def _build_mpv_section(self, parent):
@@ -225,7 +225,7 @@ class SettingsPanel:
         self.mpv_label.pack(anchor="w", pady=(4, 0))
         self._on_mpv(self.mpv_var.get())
         self._hint(parent,
-                   "Show the top 1–4 candidate moves. Higher values slow "
+                   "Show the top 1-4 candidate moves. Higher values slow "
                    "the engine's depth progression.")
         self._spacer(parent)
 

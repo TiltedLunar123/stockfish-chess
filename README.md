@@ -7,22 +7,25 @@ for your CPU on first run.
 
 ![board screenshot](docs/screenshots/board.png)
 
-## Features
+## What it does
 
-- **Play or analyse**: drag, click-click, or have Stockfish play moves
-  automatically.
-- **Suggested moves are clickable**: `Calculate Next Move` shows the engine's
-  pick in a bordered box; click it to play that move.
-- **Multi-PV**: see the top 1-4 candidate moves side by side.
-- **Play style**: Aggressive (favours captures + checks), Balanced, or
-  Defensive (prefers quiet moves + castling). Bias never costs real evaluation.
-- **Human mode**: adds opening development bias, recapture instinct, and a
-  light check/castling preference so moves look like a person picked them.
-- **Position editor**: drag pieces from the side palettes, edit FEN, set
-  castling rights, flip the board.
-- **Engine settings**: strength (1320-3200 ELO), think time (0.1-60s, type
-  any value), Syzygy tablebases path.
-- **Smooth piece animations** with an ease-out curve.
+Move pieces by dragging or by click-click, or hand the position to Stockfish and let it
+play. `Calculate Next Move` puts the engine's choice in a bordered box that you can
+click to actually play it, which sounds minor and turned out to be the thing I use most.
+Multi-PV shows the top one to four candidates side by side.
+
+Strength runs from 1320 to 3200 ELO and think time from 0.1 to 60 seconds, typed rather
+than picked off a list. You can point it at Syzygy tablebases.
+
+There are two ways to make the engine less machine-like. Play style biases it toward
+captures and checks (Aggressive) or quiet moves and castling (Defensive), and Human mode
+adds opening development preference, a recapture instinct, and a mild bias toward checks
+and castling. Neither one gives away real evaluation: anything more than 80 centipawns
+below the engine's best move stays at the bottom of the list no matter what the bias
+says, so style only reorders moves that were already close.
+
+The position editor lets you drag pieces in from the side palettes, edit the FEN
+directly, set castling rights, and flip the board. Pieces animate on an ease-out curve.
 
 ## Quick start
 
