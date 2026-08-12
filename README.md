@@ -53,7 +53,7 @@ executable bit to be set on them.
 
 The installer picks among these based on your CPU's instruction-set support:
 
-| Build | Needs | Notes |
+| Build | Requires | Notes |
 |------|---------|------|
 | `vnni512`       | AVX-512 VNNI | Fastest on Cascade Lake+ |
 | `avx512icl`     | AVX-512 (Ice Lake) | |
