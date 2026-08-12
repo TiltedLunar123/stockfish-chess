@@ -5,7 +5,7 @@ Stockfish at any strength, get move suggestions, analyse positions, and
 edit positions freely. Drop-in installer downloads the right Stockfish build
 for your CPU on first run.
 
-![board screenshot](docs/screenshots/board.png)
+![The app at the starting position: a green and cream board with captured-piece palettes above and below it, a sidebar for side to move, castling rights and engine strength, a Calculate Next Move button, and the editable FEN string along the bottom.](docs/screenshots/board.png)
 
 ## What it does
 
@@ -29,7 +29,7 @@ directly, set castling rights, and flip the board. Pieces animate on an ease-out
 
 ## Quick start
 
-Requires **Python 3.10+** on Windows, macOS, or Linux. You don't need to
+Needs **Python 3.10+** on Windows, macOS, or Linux. You don't need to
 download Stockfish yourself; the app does that on first run.
 
 ```bash
@@ -53,7 +53,7 @@ executable bit to be set on them.
 
 The installer picks among these based on your CPU's instruction-set support:
 
-| Build | Requires | Notes |
+| Build | Needs | Notes |
 |------|---------|------|
 | `vnni512`       | AVX-512 VNNI | Fastest on Cascade Lake+ |
 | `avx512icl`     | AVX-512 (Ice Lake) | |
